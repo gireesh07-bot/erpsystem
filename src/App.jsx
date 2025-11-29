@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import LoginSection from './components/LoginSection';
 import Dashboard from './components/Dashboard';
+import StudentDashboard from './components/StudentDashboard';
+import TeacherDashboard from './components/TeacherDashboard';
 import './App.css';
 
 function App() {
@@ -113,7 +115,13 @@ function App() {
           </div>
         ) : (
           <div className="dashboard-section">
-            <Dashboard userInfo={userInfo} onLogout={handleLogout} />
+            {userInfo.userType === 'student' ? (
+              <StudentDashboard userInfo={userInfo} onLogout={handleLogout} />
+            ) : userInfo.userType === 'teacher' ? (
+              <TeacherDashboard userInfo={userInfo} onLogout={handleLogout} />
+            ) : (
+              <Dashboard userInfo={userInfo} onLogout={handleLogout} />
+            )}
           </div>
         )}
       </div>

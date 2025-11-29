@@ -8,6 +8,13 @@ const LoginSection = ({ onLogin }) => {
   const [captcha, setCaptcha] = useState('');
   const [currentCaptcha, setCurrentCaptcha] = useState(generateCaptcha());
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  // Signup fields
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   function generateCaptcha() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -39,6 +46,36 @@ const LoginSection = ({ onLogin }) => {
       alert('Please fill all fields correctly and enter the correct CAPTCHA.');
     }
     
+    setIsLoading(false);
+  };
+
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Basic validation
+    if (!fullName || !email || !signupPassword || !confirmPassword) {
+      alert('Please fill all sign up fields.');
+      setIsLoading(false);
+      return;
+    }
+    if (signupPassword !== confirmPassword) {
+      alert('Passwords do not match.');
+      setIsLoading(false);
+      return;
+    }
+    if (captcha !== currentCaptcha) {
+      alert('Please enter the correct CAPTCHA.');
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate API call for sign up
+    await new Promise(resolve => setTimeout(resolve, 1400));
+
+    // For the demo we auto-create the user and log them in
+    const newUsername = email || fullName;
+    onLogin({ username: newUsername, userType, name: fullName });
     setIsLoading(false);
   };
 
@@ -81,8 +118,8 @@ const LoginSection = ({ onLogin }) => {
               <span className="logo-secondary">Portal</span>
             </div>
           </div>
-          <h1>Welcome Back</h1>
-          <p>Sign in to access your dashboard</p>
+          <h1>{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
+          <p>{isSignUp ? 'Fill details to create a new account' : 'Sign in to access your dashboard'}</p>
         </div>
 
         <div className="user-type-selector">
@@ -100,89 +137,203 @@ const LoginSection = ({ onLogin }) => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="input-group">
-            <div className="input-icon">
-              <i className="fas fa-id-card"></i>
-            </div>
-            <input
-              type="text"
-              placeholder={getUsernamePlaceholder()}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="modern-input"
-              required
-            />
-            <label className="input-label">{getUsernameLabel()}</label>
-          </div>
-
-          <div className="input-group">
-            <div className="input-icon">
-              <i className="fas fa-lock"></i>
-            </div>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="modern-input"
-              required
-            />
-            <label className="input-label">Password</label>
-          </div>
-
-          <div className="captcha-section">
-            <label className="captcha-label">Security Verification</label>
-            <div className="captcha-group">
-              <div className="captcha-display">
-                <span className="captcha-text">{currentCaptcha}</span>
-                <button 
-                  type="button" 
-                  className="captcha-refresh-btn"
-                  onClick={refreshCaptcha}
-                >
-                  <i className="fas fa-redo"></i>
-                </button>
+        {/* Render either Sign Up or Sign In form */}
+        {isSignUp ? (
+          <form onSubmit={handleSignUpSubmit} className="login-form">
+            <div className="input-group">
+              <div className="input-icon">
+                <i className="fas fa-user"></i>
               </div>
               <input
                 type="text"
-                placeholder="Enter captcha code"
-                value={captcha}
-                onChange={(e) => setCaptcha(e.target.value)}
-                className="captcha-input"
+                placeholder="Enter your full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="modern-input"
                 required
               />
+              <label className="input-label">Full Name</label>
             </div>
-          </div>
 
-          <button 
-            type="submit" 
-            className={`login-btn ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <div className="spinner"></div>
-                Signing In...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-sign-in-alt"></i>
-                Sign In
-              </>
-            )}
-          </button>
-
-          <div className="form-footer">
-            <a href="#" className="forgot-link">
-              <i className="fas fa-key"></i>
-              Forgot Password?
-            </a>
-            <div className="support-link">
-              Need help? <a href="#">Contact Support</a>
+            <div className="input-group">
+              <div className="input-icon">
+                <i className="fas fa-envelope"></i>
+              </div>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="modern-input"
+                required
+              />
+              <label className="input-label">Email</label>
             </div>
-          </div>
-        </form>
+
+            <div className="input-group">
+              <div className="input-icon">
+                <i className="fas fa-lock"></i>
+              </div>
+              <input
+                type="password"
+                placeholder="Create a password"
+                value={signupPassword}
+                onChange={(e) => setSignupPassword(e.target.value)}
+                className="modern-input"
+                required
+              />
+              <label className="input-label">Password</label>
+            </div>
+
+            <div className="input-group">
+              <div className="input-icon">
+                <i className="fas fa-lock"></i>
+              </div>
+              <input
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="modern-input"
+                required
+              />
+              <label className="input-label">Confirm Password</label>
+            </div>
+
+            <div className="captcha-section">
+              <label className="captcha-label">Security Verification</label>
+              <div className="captcha-group">
+                <div className="captcha-display">
+                  <span className="captcha-text">{currentCaptcha}</span>
+                  <button 
+                    type="button" 
+                    className="captcha-refresh-btn"
+                    onClick={refreshCaptcha}
+                  >
+                    <i className="fas fa-redo"></i>
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter captcha code"
+                  value={captcha}
+                  onChange={(e) => setCaptcha(e.target.value)}
+                  className="captcha-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              className={`login-btn ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="spinner"></div>
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-user-plus"></i>
+                  Create Account
+                </>
+              )}
+            </button>
+
+            <div className="form-footer">
+              <div className="support-link">Already have an account? <button type="button" className="signup-switch" onClick={() => setIsSignUp(false)}>Sign In</button></div>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="input-group">
+              <div className="input-icon">
+                <i className="fas fa-id-card"></i>
+              </div>
+              <input
+                type="text"
+                placeholder={getUsernamePlaceholder()}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="modern-input"
+                required
+              />
+              <label className="input-label">{getUsernameLabel()}</label>
+            </div>
+
+            <div className="input-group">
+              <div className="input-icon">
+                <i className="fas fa-lock"></i>
+              </div>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="modern-input"
+                required
+              />
+              <label className="input-label">Password</label>
+            </div>
+
+            <div className="captcha-section">
+              <label className="captcha-label">Security Verification</label>
+              <div className="captcha-group">
+                <div className="captcha-display">
+                  <span className="captcha-text">{currentCaptcha}</span>
+                  <button 
+                    type="button" 
+                    className="captcha-refresh-btn"
+                    onClick={refreshCaptcha}
+                  >
+                    <i className="fas fa-redo"></i>
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter captcha code"
+                  value={captcha}
+                  onChange={(e) => setCaptcha(e.target.value)}
+                  className="captcha-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              className={`login-btn ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="spinner"></div>
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-sign-in-alt"></i>
+                  Sign In
+                </>
+              )}
+            </button>
+
+            <div className="form-footer">
+              <a href="#" className="forgot-link">
+                <i className="fas fa-key"></i>
+                Forgot Password?
+              </a>
+              <div className="support-link">
+                Need help? <a href="#">Contact Support</a>
+              </div>
+              <div style={{marginLeft: 'auto'}}>
+                Don't have an account? <button type="button" className="signup-switch" onClick={() => setIsSignUp(true)}>Sign Up</button>
+              </div>
+            </div>
+          </form>
+        )}
 
         <div className="card-footer">
           <div className="security-notice">
